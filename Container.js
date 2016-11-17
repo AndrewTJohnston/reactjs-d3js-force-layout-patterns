@@ -15,7 +15,10 @@ export default React.createClass({
   	return (
 			<div>
 				<p>This is some container component</p>
-				<Nodes data={ this.state.data } width={ this.state.width } height={ this.state.height } />
+				<Nodes
+					data={ this.state.data }
+					width={ this.state.width }
+					height={ this.state.height } />
 			</div>
     )
   }

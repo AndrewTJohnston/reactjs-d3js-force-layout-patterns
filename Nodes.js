@@ -14,18 +14,14 @@ export default React.createClass({
 		    .attr("preserveAspectRatio", "xMinYMin")
 				.attr("xmlns","http://www.w3.org/2000/svg")
 				.attr("version","1.1")
-
-		var simulation = d3.forceSimulation()
-			.force("link", 		d3.forceLink().id(function(d) { return d.id; }))
-    	.force("charge", 	d3.forceManyBody().strength(-15000).theta(1).distanceMax(1000))
-    	.force("center", 	d3.forceCenter(0.5*width,0.5*height))
+		//svg.attr("visibility","hidden")
 
 		var link = svg.append("g")
 			.attr("class", "links")
 	    	.selectAll("line")
 	    		.data(data.links)
 	    			.enter().append("line")
-	      			.attr("stroke-width", function(d) { return 10; })
+	      			.attr("stroke-width", function(d) { return 20; })
 	      			.attr("stroke", 			function(d) { return "#e12828"; })
 
 	  var node = svg.append("g")
@@ -41,9 +37,9 @@ export default React.createClass({
 					.attr("onclick", 		function(d) { return ("ga('send','event','link_outbound','"+d.url+"')"); })
 					.append("circle")
 					.attr('id', function(d) { return ("circle_"+d.id); })
-	      	.attr("r", width/10)
+	      	.attr("r", width/12)
 					.attr("fill", function(d) { return ("url(#pattern_"+d.id+")"); })
-	      	.attr("stroke-width", function(d) { return 2; })
+	      	.attr("stroke-width", function(d) { return 7; })
 	      	.attr("stroke", function(d) { return "#ffffff"; })
 	      	.call(d3.drag()
 	        	.on("start", 	function(d) { dragStart	(d,simulation,width) })
@@ -78,6 +74,11 @@ export default React.createClass({
 
 	  	node.append("title").text(function(d) { return d.id; })
 
+			var simulation = d3.forceSimulation()
+				.force("link", 		d3.forceLink().distance(50).id(function(d) { return d.id; }))
+				.force("charge", 	d3.forceManyBody().strength(-15000).theta(0).distanceMax(1000))
+				.force("center", 	d3.forceCenter(0.5*width,0.5*height))
+
 	  	simulation.nodes(data.nodes).on("tick", ticked)
 
 	  	simulation.force("link").links(data.links);
@@ -85,7 +86,14 @@ export default React.createClass({
 	  	function ticked() {
 				updateLink(link);
 				updateNode(node);
+			}
+
+		var k = 0;
+		while ((simulation.alpha() > 0.02) && (k<150)) { // You'll want to try out different, "small" values for this
+    		simulation.tick();
+				k = k+1;
 		}
+
 	},
 
 	render() {
@@ -93,7 +101,7 @@ export default React.createClass({
     	return (
 				<div>
 					<p>This is the d3 visualization.</p>
-					<div ref='hook' />
+					<div ref='hook' className="something"/>
 				</div>
     	)
   	}
@@ -123,7 +131,7 @@ var dragged = (d,simulation,width) => {
 };
 
 var dragEnd = (d,simulation,width) => {
-	if (!d3.event.active) simulation.alphaTarget(0);
+	if (!d3.event.active) simulation.alphaTarget(0.3);
 	d.fx = null;
 	d.fy = null;
 	mouseOut(d,width);
@@ -136,5 +144,5 @@ var mouseOver = (d,width) => {
 
 var mouseOut = (d,width) => {
 	d3.select("#pattern_circle_"+d.id).attr("fill", function(d) { return "#333333"; })
-	d3.select("#circle_"+d.id).transition().ease(d3.easeElastic).duration("600").attr("r",width/10);
+	d3.select("#circle_"+d.id).transition().ease(d3.easeElastic).duration("600").attr("r",width/12);
 };

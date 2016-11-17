@@ -1,2 +1,2 @@
-#app { width: 20%; }
-.something { width: 1000px; height: 500px; }
+
+.something { width: 100%; max-width: 400px; margin: 0 auto; }
